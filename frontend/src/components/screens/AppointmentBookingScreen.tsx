@@ -22,6 +22,7 @@ import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { EmptyState } from '../ui/EmptyState';
 import { apiPost, apiGet } from '../../services/api';
+import { isValidImageUrl } from '../../utils/helpers';
 
 interface Doctor {
   _id: string;
@@ -372,7 +373,7 @@ const AppointmentBookingScreen: React.FC = () => {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-cyan-500/10 flex items-center justify-center">
-                        {doctor.avatar ? (
+                        {doctor.avatar && isValidImageUrl(doctor.avatar) ? (
                           <img src={doctor.avatar} alt={doctor.name} className="w-12 h-12 rounded-full" />
                         ) : (
                           <User className="w-6 h-6 text-cyan-400" />

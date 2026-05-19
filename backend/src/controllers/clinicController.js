@@ -5,6 +5,20 @@
 const Clinic = require('../models/Clinic');
 const { sendSuccess, sendError } = require('../utils/apiResponse');
 
+const isStringQuery = (value) => {
+  if (typeof value === 'string') return value.trim();
+  if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') return value[0].trim();
+  return '';
+};
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const buildSafeRegex = (value) => {
+  if (!value) return null;
+  const safeValue = value.slice(0, 100);
+  return new RegExp(escapeRegex(safeValue), 'i');
+};
+
 /**
  * @desc    Create clinic
  * @route   POST /api/clinics
@@ -28,22 +42,44 @@ exports.createClinic = async (req, res, next) => {
 exports.getClinics = async (req, res, next) => {
   try {
     const { city, district, specialty, search, page = 1, limit = 20 } = req.query;
-    
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (!Number.isInteger(pageNumber) || pageNumber < 1) {
+      return sendError(res, 'Invalid page parameter', 400);
+    }
+
+    if (!Number.isInteger(limitNumber) || limitNumber < 1 || limitNumber > 100) {
+      return sendError(res, 'Invalid limit parameter', 400);
+    }
+
     const filter = { isActive: true };
-    if (city) filter['address.city'] = new RegExp(city, 'i');
-    if (district) filter['address.district'] = new RegExp(district, 'i');
-    if (specialty) filter.specialty = new RegExp(specialty, 'i');
-    if (search) filter.name = new RegExp(search, 'i');
-    
+
+    const cityQuery = isStringQuery(city);
+    const districtQuery = isStringQuery(district);
+    const specialtyQuery = isStringQuery(specialty);
+    const searchQuery = isStringQuery(search);
+
+    const cityRegex = buildSafeRegex(cityQuery);
+    const districtRegex = buildSafeRegex(districtQuery);
+    const specialtyRegex = buildSafeRegex(specialtyQuery);
+    const searchRegex = buildSafeRegex(searchQuery);
+
+    if (cityRegex) filter['address.city'] = cityRegex;
+    if (districtRegex) filter['address.district'] = districtRegex;
+    if (specialtyRegex) filter.specialty = specialtyRegex;
+    if (searchRegex) filter.name = searchRegex;
+
     const clinics = await Clinic.find(filter)
       .populate('doctorId', 'name specialization')
       .sort({ 'rating.average': -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
-    
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
     const total = await Clinic.countDocuments(filter);
-    
-    sendSuccess(res, { clinics, total, page: Number(page), pages: Math.ceil(total / limit) }, 'Clinics retrieved');
+
+    sendSuccess(res, { clinics, total, page: pageNumber, pages: Math.ceil(total / limitNumber) }, 'Clinics retrieved');
   } catch (error) {
     next(error);
   }

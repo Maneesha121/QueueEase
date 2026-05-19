@@ -139,6 +139,20 @@ export const formatNumber = (num: number): string => {
 };
 
 /**
+ * Validate image URLs before assigning to DOM attributes
+ */
+export const isValidImageUrl = (value: unknown): boolean => {
+  if (typeof value !== 'string' || !value.trim()) return false;
+
+  try {
+    const url = new URL(value, window.location.origin);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Clamp a number between min and max
  */
 export const clamp = (value: number, min: number, max: number): number => {

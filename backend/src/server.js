@@ -4,7 +4,7 @@
  */
 
 const express = require('express');
-const http = require('http');
+const csrf = require('csurf');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -17,6 +17,8 @@ const connectDB = require('./config/database');
 const { initializeSocket } = require('./sockets');
 const errorHandler = require('./middleware/errorHandler');
 
+let server;
+
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const queueRoutes = require('./routes/queueRoutes');
@@ -27,9 +29,6 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
-
-// Create HTTP server for Socket.IO
-const server = http.createServer(app);
 
 // ─── Middleware ────────────────────────────────────────────
 
@@ -49,6 +48,23 @@ app.use(compression());
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// CSRF protection
+app.use(csrf({
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: config.env === 'production',
+  },
+  ignoreMethods: ['GET', 'HEAD', 'OPTIONS'],
+}));
+
+app.get('/api/csrf-token', (req, res) => {
+  res.status(200).json({
+    success: true,
+    csrfToken: req.csrfToken(),
+  });
+});
 
 // Rate limiting
 const limiter = rateLimit({
@@ -95,6 +111,13 @@ app.all('*', (req, res) => {
   });
 });
 
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    return sendError(res, 'Invalid CSRF token', 403);
+  }
+  return next(err);
+});
+
 // Global error handler
 app.use(errorHandler);
 
@@ -106,12 +129,8 @@ const start = async () => {
   try {
     // Connect to MongoDB
     await connectDB();
-    
-    // Initialize Socket.IO
-    initializeSocket(server, config.socketCorsOrigin);
-    
-    // Start server
-    server.listen(PORT, () => {
+
+    server = app.listen(PORT, () => {
       console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║                                                        ║
@@ -123,6 +142,8 @@ const start = async () => {
 ║                                                        ║
 ╚════════════════════════════════════════════════════════╝
       `);
+
+      initializeSocket(server, config.socketCorsOrigin);
     });
   } catch (error) {
     console.error('💥 Failed to start server:', error);
@@ -133,15 +154,23 @@ const start = async () => {
 // Handle unhandled rejections
 process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);
-  server.close(() => process.exit(1));
+  if (server) {
+    server.close(() => process.exit(1));
+  } else {
+    process.exit(1);
+  }
 });
 
 // Handle SIGTERM
 process.on('SIGTERM', () => {
   console.log('👋 SIGTERM received. Shutting down gracefully...');
-  server.close(() => {
-    console.log('💥 Process terminated!');
-  });
+  if (server) {
+    server.close(() => {
+      console.log('💥 Process terminated!');
+    });
+  } else {
+    process.exit(0);
+  }
 });
 
 start();

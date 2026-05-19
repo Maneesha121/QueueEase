@@ -6,8 +6,15 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
+const env = process.env.NODE_ENV || 'development';
+const jwtSecret = process.env.JWT_SECRET;
+
+if (env === 'production' && !jwtSecret) {
+  throw new Error('JWT_SECRET must be provided in production');
+}
+
 module.exports = {
-  env: process.env.NODE_ENV || 'development',
+  env,
   port: process.env.PORT || 5000,
   
   // MongoDB
@@ -15,7 +22,7 @@ module.exports = {
   
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
+    secret: jwtSecret,
     expire: process.env.JWT_EXPIRE || '7d',
   },
   
@@ -29,7 +36,7 @@ module.exports = {
   // ML Microservice
   mlService: {
     url: process.env.ML_SERVICE_URL || 'http://localhost:8001',
-    apiKey: process.env.ML_API_KEY || 'queueease-ml-api-key-2024',
+    apiKey: process.env.ML_API_KEY,
   },
   
   // CORS
