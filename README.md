@@ -532,14 +532,4 @@ The system is specifically designed for Sri Lankan healthcare:
 
 ---
 
-## License
 
-This project is proprietary software. All rights reserved.
-
----
-
-## Acknowledgments
-
-- Built with React, Express.js, FastAPI, and scikit-learn
-- Designed for the Sri Lankan healthcare context
-- Inspired by the need to reduce patient wait times and improve clinic efficiency
