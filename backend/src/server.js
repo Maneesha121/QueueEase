@@ -16,6 +16,7 @@ const config = require('./config');
 const connectDB = require('./config/database');
 const { initializeSocket } = require('./sockets');
 const errorHandler = require('./middleware/errorHandler');
+const { sendError } = require('./utils/apiResponse');
 
 let server;
 
@@ -27,6 +28,7 @@ const clinicRoutes = require('./routes/clinicRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
 
 const app = express();
 
@@ -102,6 +104,7 @@ app.use('/api/clinics', clinicRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // 404 handler
 app.all('*', (req, res) => {

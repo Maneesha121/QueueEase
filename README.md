@@ -22,9 +22,9 @@ The system serves three distinct user roles — **patients**, **doctors**, and *
 ├──────────────┬──────────────────┬────────────────────────────────┤
 │   Frontend   │     Backend      │        AI / ML Service         │
 │   (React +   │   (Express.js +  │     (FastAPI + scikit-learn)   │
-│    Vite +     │    MongoDB +     │                                │
-│    TypeScript)│    Socket.IO)    │   Random Forest Regressor      │
-│              │                  │   Feature Engineering Pipeline  │
+│   Vite +     │    MongoDB +     │                                │
+│   TypeScript)│    Socket.IO)    │   Random Forest Regressor      │
+│              │                  │   Feature Engineering Pipeline │
 │  13 Screens  │   REST API       │   Batch Prediction API         │
 │  3 Dashboards│   WebSocket RT   │   Model Training & Persistence │
 │  Zustand     │   JWT + Firebase │   Synthetic Data Generation    │

@@ -20,6 +20,7 @@ const AnalyticsScreen = lazy(() => import('./components/screens/AnalyticsScreen'
 const QueueDetailsScreen = lazy(() => import('./components/screens/QueueDetailsScreen'));
 const SettingsScreen = lazy(() => import('./components/screens/SettingsScreen'));
 const EmergencyPriorityScreen = lazy(() => import('./components/screens/EmergencyPriorityScreen'));
+const ChatbotScreen = lazy(() => import('./components/screens/ChatbotScreen'));
 
 // TanStack Query Client
 const queryClient = new QueryClient({
@@ -201,6 +202,18 @@ function AnimatedRoutes() {
               <AppLayout>
                 <PageSuspense>
                   <AppointmentBookingScreen />
+                </PageSuspense>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chatbot"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <PageSuspense>
+                  <ChatbotScreen />
                 </PageSuspense>
               </AppLayout>
             </ProtectedRoute>

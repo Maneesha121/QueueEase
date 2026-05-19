@@ -11,18 +11,42 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor — attach token
+const csrfClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const fetchCsrfToken = async (): Promise<string | undefined> => {
+  const response = await csrfClient.get<ApiResponse<{ csrfToken: string }>>('/csrf-token');
+  return response.data.data?.csrfToken;
+};
+
+// Request interceptor — attach token and CSRF header for unsafe requests
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const token = localStorage.getItem('queueease_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    const method = config.method?.toLowerCase();
+    if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+      const csrfToken = await fetchCsrfToken();
+      if (csrfToken) {
+        config.headers['X-CSRF-Token'] = csrfToken;
+      }
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

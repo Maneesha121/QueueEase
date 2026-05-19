@@ -8,13 +8,14 @@ import { useAuthStore } from '../../stores/authStore';
 import { useUIStore } from '../../stores/uiStore';
 import {
   Home, Calendar, BarChart3, Bell, Settings, User,
-  Stethoscope, LogOut, Menu, X, ChevronRight
+  Stethoscope, LogOut, Menu, X, ChevronRight, MessageSquare
 } from 'lucide-react';
 
 const PATIENT_NAV = [
   { path: '/patient/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/patient/queue', icon: Stethoscope, label: 'Queue' },
   { path: '/patient/appointments', icon: Calendar, label: 'Appointments' },
+  { path: '/chatbot', icon: MessageSquare, label: 'AI Assistant' },
   { path: '/notifications', icon: Bell, label: 'Alerts' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
@@ -23,6 +24,7 @@ const DOCTOR_NAV = [
   { path: '/doctor/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/doctor/queue', icon: Stethoscope, label: 'Queue' },
   { path: '/doctor/analytics', icon: BarChart3, label: 'Analytics' },
+  { path: '/chatbot', icon: MessageSquare, label: 'AI Assistant' },
   { path: '/notifications', icon: Bell, label: 'Alerts' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
@@ -31,6 +33,7 @@ const RECEPTIONIST_NAV = [
   { path: '/receptionist/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/receptionist/queue', icon: Stethoscope, label: 'Queue' },
   { path: '/receptionist/appointments', icon: Calendar, label: 'Appointments' },
+  { path: '/chatbot', icon: MessageSquare, label: 'AI Assistant' },
   { path: '/notifications', icon: Bell, label: 'Alerts' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
