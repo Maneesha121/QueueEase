@@ -16,7 +16,6 @@ The system serves three distinct user roles — **patients**, **doctors**, and *
 
 ## Architecture
 
-```
 ┌──────────────────────────────────────────────────────────────────┐
 │                        QueueEase V2 Architecture                 │
 ├──────────────┬──────────────────┬────────────────────────────────┤
@@ -30,7 +29,7 @@ The system serves three distinct user roles — **patients**, **doctors**, and *
 │  Zustand     │   JWT + Firebase │   Synthetic Data Generation    │
 │  TanStack Q  │   Role-Based ACL │                                │
 └──────────────┴──────────────────┴────────────────────────────────┘
-```
+
 
 ---
 
@@ -358,6 +357,59 @@ python -m app.train_model
 # Start the API server
 python run.py
 # Or: uvicorn app.ml_api:app --host 0.0.0.0 --port 8000 --reload
+
+---
+
+## Full local run from the beginning
+
+1. Start MongoDB
+   - If you have MongoDB installed as a service, run:
+     ```powershell
+     Get-Service MongoDB
+     Start-Service MongoDB
+     ```
+   - Confirm it is running on `localhost:27017`.
+
+2. Start the backend
+   ```powershell
+   cd "c:\Users\ASUS\OneDrive - sci.sjp.ac.lk\Desktop\New folder\mc 1am\backend"
+   npm install
+   # Copy env example to .env and edit if needed
+   copy .env.example .env
+   npm run dev
+   ```
+   - Backend will run at `http://localhost:5000`
+   - Health check: `http://localhost:5000/api/health`
+
+3. Start the frontend
+   ```powershell
+   cd "c:\Users\ASUS\OneDrive - sci.sjp.ac.lk\Desktop\New folder\mc 1am\frontend"
+   npm install
+   # Copy example env and update Firebase values if you want auth
+   copy .env.example .env
+   npm run dev -- --host 0.0.0.0
+   ```
+   - Frontend will run at `http://localhost:5173/`
+
+4. Optional: Start the AI / ML service
+   ```powershell
+   cd "c:\Users\ASUS\OneDrive - sci.sjp.ac.lk\Desktop\New folder\mc 1am\ai"
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   python train_model.py
+   uvicorn app.ml_api:app --reload --host 127.0.0.1 --port 8001
+   ```
+   - AI service will run at `http://localhost:8001`
+
+5. Open the app
+   - `http://localhost:5173/`
+   - Confirm backend is healthy: `http://localhost:5000/api/health`
+
+### Important notes
+- `frontend/.env` and `backend/.env` must both exist for local development.
+- If you use Firebase auth, fill in the Firebase values in `frontend/.env`.
+- The backend currently serves API routes under `/api`, so the frontend must use `http://localhost:5000/api` as the base URL.
 
 # Run tests
 pytest tests/ -v
