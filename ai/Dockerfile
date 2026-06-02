@@ -1,5 +1,5 @@
 # ── Build stage ───────────────────────────────────────────────────────────────
-FROM python:3.11-slim AS builder
+FROM python:3.15-rc-alpine3.22 AS builder
 
 WORKDIR /build
 
@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
 # ── Runtime stage ─────────────────────────────────────────────────────────────
-FROM python:3.11-slim
+FROM python:3.15-rc-alpine3.22
 
 LABEL maintainer="QueueEase Team <group24@sjp.ac.lk>"
 LABEL description="QueueEase ML API — waiting-time prediction service"
