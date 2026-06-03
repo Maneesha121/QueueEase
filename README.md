@@ -1,12 +1,4 @@
-Yes. Based on your **approved proposal**, current implementation, and the decision to **remove multilingual support**, I would update the README so it accurately reflects the final project while also making it look more professional and aligned with what examiners expect.
 
-The biggest improvement is to position QueueEase as:
-
-> **An AI-powered queue intelligence system for a single private doctor's clinic**, not just a queue app.
-
----
-
-# Updated Project Overview
 
 ## QueueEase – AI-Powered Smart Queue Management System for a Private Doctor's Practice
 
